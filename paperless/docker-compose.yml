@@ -1,0 +1,106 @@
+#
+# paperless-ngx
+#
+version: "3.6"
+
+volumes:
+  paperless_data:
+    external: true
+  paperless_media:
+    external: true
+  paperless_export:
+    external: true
+  paperless_consume:
+    external: true
+  paperless_db:
+    external: true
+
+networks:
+  paperless_net:
+    external: true
+
+services:
+  broker:
+    image: redis
+    container_name: Paperless-NGX-REDIS
+    restart: "no"
+    networks:
+      - paperless_net
+    volumes:
+      - /volume1/docker/paperlessngx/redis:/data
+
+  db:
+    image: postgres:15
+    container_name: Paperless-NGX-DB
+    restart: "no"
+    networks:
+      - paperless_net
+    volumes:
+      - paperless_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: Paperless-NGX
+    restart: "no"
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika  
+    networks:
+      - paperless_net
+    labels:
+      - "traefik.enable=true"
+      
+      - "traefik.http.routers.paperless-https.entrypoints=websecure"
+      - "traefik.http.routers.paperless-https.rule=Host(`${APP_HOST_NAME}`)"
+      - "traefik.http.routers.paperless-https.tls=true"
+      
+      - "traefik.http.routers.paperless-http.entrypoints=web"
+      - "traefik.http.routers.paperless-http.rule=Host(`${APP_HOST_NAME}`)"
+      - "traefik.http.routers.paperless-http.middlewares=paperless-https"
+      
+      - "traefik.http.middlewares.paperless-https.redirectscheme.scheme=https"
+    volumes:
+      - paperless_data:/usr/src/paperless/data
+      - paperless_media:/usr/src/paperless/media
+      - paperless_export:/usr/src/paperless/export
+      - paperless_consume:/usr/src/paperless/consume
+      
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_URL: https://${APP_HOST_NAME}
+      USERMAP_UID: 1028
+      USERMAP_GID: 100
+      PAPERLESS_TIME_ZONE: Europe/Berlin
+      PAPERLESS_ADMIN_USER: ${APP_ADMIN_USER}
+      PAPERLESS_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
+      PAPERLESS_OCR_LANGUAGE: deu+eng
+      PAPERLESS_TASK_WORKERS: 4
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:7.8
+    restart: "no"
+    networks:
+      - paperless_net
+
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+
+  tika:
+    image: ghcr.io/paperless-ngx/tika:latest
+    restart: "no"
+    networks:
+      - paperless_net
+
