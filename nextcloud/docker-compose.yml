@@ -1,0 +1,110 @@
+#
+# NEXTCLOUD
+#
+version: '2'
+
+volumes:
+  nextcloud:
+    external: true
+  nextcloud_db:
+    external: true
+  nextcloud_data:
+    external: true
+  paperless_media:
+    external: true
+  paperless_consume:
+    external: true 
+
+networks:
+  nextcloud_net:
+    external: true
+  
+services:
+  db:
+    image: mariadb:10.6
+    restart: "no"
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - nextcloud_db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+    networks:
+      - nextcloud_net
+
+  redis:
+    image: redis:latest
+    restart: "no"
+    networks:
+      - nextcloud_net
+    volumes:
+      - /docker_data/nextcloud/redis:/data
+
+  app:
+    image: nextcloud:latest
+    restart: "no"
+    #ports:
+      #- 9002:80
+    networks:
+      # - proxy
+      - nextcloud_net
+    depends_on:
+      - redis
+      - db
+    labels:
+      - "traefik.enable=true"
+      
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.rule=Host(`${APP_HOST_NAME}`)"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.middlewares=nc-rep,nc-header"
+      
+      - "traefik.http.routers.nextcloud-http.entrypoints=web"
+      - "traefik.http.routers.nextcloud-http.rule=Host(`${APP_HOST_NAME}`)"
+      - "traefik.http.routers.nextcloud-http.middlewares=nextcloud-https,nc-rep,nc-header"
+      
+      - "traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https"
+           
+      - "traefik.http.middlewares.nc-rep.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.nc-rep.redirectregex.replacement=https://$$1/remote.php/dav/"
+      - "traefik.http.middlewares.nc-rep.redirectregex.permanent=true"   
+      
+      - "traefik.http.middlewares.nc-header.headers.stsSeconds=31536000"
+
+    links:
+      - db
+      - redis
+    volumes:
+      - nextcloud:/var/www/html
+      - nextcloud_data:/var/www/html/data
+      
+      # Paperless documents and consume folder. Skip if you don't use paperless
+      - paperless_media:/external/paperless_media
+      - paperless_consume:/external/paperless_consume
+    environment:
+      - NEXTCLOUD_ADMIN_USER=${APP_ADMIN_NAME}
+      - NEXTCLOUD_ADMIN_PASSWORD=${APP_ADMIN_PASSWORD}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${APP_HOST_NAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_HOST=db
+      - REDIS_HOST=redis
+      - PHP_UPLOAD_LIMIT=8G
+      - PHP_MEMORY_LIMIT=8G
+
+  cron:
+    image: nextcloud:latest
+    restart: "no"
+    volumes:
+      - nextcloud:/var/www/html
+      - nextcloud_data:/var/www/html/data
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
+    networks:
+      - nextcloud_net
+      

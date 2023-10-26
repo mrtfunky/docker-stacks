@@ -1,0 +1,9 @@
+/librephotos
+/nextcloud_test
+/paperless
+/photoprism
+/scripts
+/traefik
+/backup_stacks.sh
+.env
+nextcloud/backup_nextcloud.sh
