@@ -1,0 +1,50 @@
+version: "3.3"
+
+volumes:
+  traefik_certs:
+    external: true
+  traefik_config:
+    external: true
+
+networks:
+  nextcloud_net:
+    external: true
+  paperless_net:
+    external: true
+  librephotos_net:
+    external: true
+    
+services:
+  traefik:
+    image: "traefik:latest"
+    restart: always
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic_conf"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - nextcloud_net
+      - paperless_net
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - traefik_certs:/etc/traefik/certs
+      - traefik_config:/etc/traefik/dynamic_conf
+
+  whoami:
+    image: "traefik/whoami"
+    restart: always
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Path(`/whoami`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoamitls.tls=true"
