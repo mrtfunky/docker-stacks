@@ -24,8 +24,8 @@ services:
       - nas_photos:/data/synology_photos:ro
       - nas_music:/data/synology_music:ro
       - nas_audiobooks:/data/nas_audiobooks:ro
-    ports:
-      - 8096:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+    # ports:
+      # - 8096:8096
+      # - 8920:8920 #optional
+      # - 7359:7359/udp #optional
+      # - 1900:1900/udp #optional
