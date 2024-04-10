@@ -1,9 +1,9 @@
-version: "2.1"
-
 volumes:
   nas_photos:
     external: true
   nas_music:
+    external: true
+  nas_audiobooks:
     external: true
   jellyfin_data:
     external: true
@@ -12,6 +12,7 @@ services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
+    network_mode: host
     restart: "no"
     environment:
       - PUID=1026
@@ -22,6 +23,7 @@ services:
       - jellyfin_data:/config
       - nas_photos:/data/synology_photos:ro
       - nas_music:/data/synology_music:ro
+      - nas_audiobooks:/data/nas_audiobooks:ro
     ports:
       - 8096:8096
       - 8920:8920 #optional

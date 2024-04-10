@@ -1,5 +1,3 @@
-version: "3.3"
-
 volumes:
   traefik_certs:
     external: true
@@ -10,10 +8,6 @@ networks:
   nextcloud_net:
     external: true
   paperless_net:
-    external: true
-  librephotos_net:
-    external: true
-  photoprism_net:
     external: true
 
 services:
@@ -36,8 +30,6 @@ services:
     networks:
       - nextcloud_net
       - paperless_net
-      - photoprism_net
-      - librephotos_net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - traefik_certs:/etc/traefik/certs

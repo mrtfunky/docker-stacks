@@ -1,8 +1,6 @@
 #
 # paperless-ngx
 #
-version: "3.6"
-
 volumes:
   paperless_data:
     external: true
@@ -75,15 +73,19 @@ services:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
       PAPERLESS_URL: https://${APP_HOST_NAME}
-      USERMAP_UID: 1028
-      USERMAP_GID: 100
+      USERMAP_UID: 33
+      USERMAP_GID: 33
       PAPERLESS_TIME_ZONE: Europe/Berlin
       PAPERLESS_ADMIN_USER: ${APP_ADMIN_USER}
       PAPERLESS_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
       PAPERLESS_OCR_LANGUAGE: deu+eng
       PAPERLESS_TASK_WORKERS: 4
+      PAPERLESS_TIKA_ENABLED: true
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_CONSUMER_ENABLE_BARCODES: true # enable search for barcodes
+      PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE: true # enable setting ASN by ASN barcodes
+      PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.8

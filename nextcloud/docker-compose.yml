@@ -1,8 +1,6 @@
 #
 # NEXTCLOUD
 #
-version: '2'
-
 volumes:
   nextcloud:
     external: true
@@ -13,7 +11,7 @@ volumes:
   paperless_media:
     external: true
   paperless_consume:
-    external: true 
+    external: true
 
 networks:
   nextcloud_net:
