@@ -15,12 +15,11 @@ volumes:
 
 networks:
   paperless_net:
-    external: true
+     external: true
 
 services:
   broker:
-    image: redis
-    container_name: Paperless-NGX-REDIS
+    image: docker.io/library/redis:7
     restart: "no"
     networks:
       - paperless_net
@@ -28,8 +27,7 @@ services:
       - /volume1/docker/paperlessngx/redis:/data
 
   db:
-    image: postgres:15
-    container_name: Paperless-NGX-DB
+    image: docker.io/library/postgres:15
     restart: "no"
     networks:
       - paperless_net
@@ -42,15 +40,15 @@ services:
 
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    container_name: Paperless-NGX
     restart: "no"
     depends_on:
-      - db
       - broker
+      - db
       - gotenberg
-      - tika  
+      - tika
     networks:
       - paperless_net
+
     labels:
       - "traefik.enable=true"
       
@@ -88,7 +86,7 @@ services:
       PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.8
+    image: docker.io/gotenberg/gotenberg:8.7
     restart: "no"
     networks:
       - paperless_net
