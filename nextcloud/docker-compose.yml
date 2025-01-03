@@ -46,7 +46,7 @@ services:
     #ports:
       #- 9002:80
     networks:
-      # - proxy
+      # - traefik_net
       - nextcloud_net
     depends_on:
       - redis
@@ -62,7 +62,7 @@ services:
       - "traefik.http.routers.nextcloud-http.entrypoints=web"
       - "traefik.http.routers.nextcloud-http.rule=Host(`${APP_HOST_NAME}`)"
       - "traefik.http.routers.nextcloud-http.middlewares=nextcloud-https,nc-rep,nc-header"
-      
+
       - "traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https"
            
       - "traefik.http.middlewares.nc-rep.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
