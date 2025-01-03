@@ -19,19 +19,11 @@ echo "### Starting ${APP_NAME} backup"
 echo "#################################"
 echo ""
 
-# Stop stack
-echo "Stopping stack..."
-docker compose -f $COMPOSE_FILE down
-
 # Backup volumes
 create_archive ${APP_NAME}_data     ${APP_NAME}_data_backup
 
 # Clean old backups
 delete_old_backups 1 $BACKUP_DIR
-
-# Start stack
-echo "Starting stack"
-docker compose -f $COMPOSE_FILE up -d
 
 echo ""
 echo "#################################"

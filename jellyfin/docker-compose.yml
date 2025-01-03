@@ -24,6 +24,9 @@ services:
       - nas_photos:/data/synology_photos:ro
       - nas_music:/data/synology_music:ro
       - nas_audiobooks:/data/nas_audiobooks:ro
+      - /volume2/movies:/data/movies:ro
+      - /volume2/shows:/data/shows:ro
+      - /volume2/books:/data/books:ro
     # ports:
       # - 8096:8096
       # - 8920:8920 #optional
