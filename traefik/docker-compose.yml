@@ -9,6 +9,10 @@ networks:
     external: true
   paperless_net:
     external: true
+  vaultwarden_net:
+    external: true
+  traefik_net:
+    external: true
 
 services:
   traefik:
@@ -28,8 +32,10 @@ services:
       - "443:443"
       - "8080:8080"
     networks:
+      - traefik_net
       - nextcloud_net
       - paperless_net
+      - vaultwarden_net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - traefik_certs:/etc/traefik/certs
@@ -39,6 +45,8 @@ services:
     image: "traefik/whoami"
     restart: always
     container_name: "simple-service"
+    networks:
+      - traefik_net
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Path(`/whoami`)"

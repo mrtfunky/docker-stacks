@@ -1,0 +1,38 @@
+volumes:
+    vaultwarden_data:
+        external: true
+
+networks:
+    vaultwarden_net:
+        external: true
+
+services:
+    vaultwarden:
+        image: vaultwarden/server:latest
+        restart: no
+        networks:
+            - vaultwarden_net
+        environment:
+            - ADMIN_TOKEN=${VW_ADMIN_PASSWORD}
+            - WEBSOCKET_ENABLED=true
+            - SIGNUPS_ALLOWED=false
+            - INVITATIONS_ALLOWED=false
+            - LOG_FILE=/data/vaultwarden.log
+            - LOG_LEVEL=warn
+            - EXTENDED_LOGGING=true
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+        volumes:
+            - vaultwarden_data:/data
+        labels:
+            - "traefik.enable=true"
+
+            - "traefik.http.routers.vaultwarden-https.entrypoints=websecure"
+            - "traefik.http.routers.vaultwarden-https.rule=Host(`${APP_HOST_NAME}`)"
+            - "traefik.http.routers.vaultwarden-https.tls=true"
+
+            - "traefik.http.routers.vaultwarden-http.entrypoints=web"
+            - "traefik.http.routers.vaultwarden-http.rule=Host(`${APP_HOST_NAME}`)"
+            - "traefik.http.routers.vaultwarden-http.middlewares=vaultwarden-https"
+
+            - "traefik.http.middlewares.vaultwarden-https.redirectscheme.scheme=https"
