@@ -19,7 +19,7 @@ networks:
   
 services:
   db:
-    image: mariadb:10.6
+    image: mariadb:10.11
     restart: "no"
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
@@ -29,6 +29,7 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USER}
+      - MARIADB_AUTO_UPGRADE=1
     networks:
       - nextcloud_net
 
