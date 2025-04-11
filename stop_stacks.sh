@@ -14,6 +14,22 @@ stop_stack(){
 
 source ${SCRIPT_DIR}/stacks.sh
 
+# Empty array to hold PIDs
+pids=()
+
+echo "Stopping stacks in parallel..."
 for stack in ${stacks[@]}; do
-    stop_stack ${stack}
+    stop_stack ${stack} &
+
+    # Get the PID of the last background command
+    pid=$!
+
+    # Add the PID to the array
+    pids+=($pid)
 done
+
+# Wait for all background processes to finish
+for pid in ${pids[@]}; do
+    wait $pid
+done
+echo "All stacks stopped."

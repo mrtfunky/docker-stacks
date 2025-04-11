@@ -36,13 +36,26 @@ pull_stacks(){
 stop_stacks(){
     stacks=$1
 
+    # Array of pids
+    pids=()
+
+    # Loop through the stacks and stop them
     for service in "${stacks[@]}"
     do
         stack_path=$SCRIPT_DIR/$service/docker-compose.yml
-        echo "### Stopping $service"
+        echo "### Stopping $service ..."
 
-        ${docker_cmd} compose -f $stack_path down
+        # Stop the stack in the background and save the pid in the array
+        ${docker_cmd} compose -f $stack_path down &
+        pid=$!
+        pids+=($pid)
     done
+
+    # Wait for all background processes to finish
+    for pid in ${pids[@]}; do
+        wait $pid
+    done    
+    echo "### All stacks stopped."
 }
 
 start_stacks(){
