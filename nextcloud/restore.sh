@@ -1,38 +1,52 @@
 #!/bin/bash
 
-BACKUP_FOLDER=/home/karl/backups/nextcloud
+DRY_RUN=""
+# Check parameter 
+if [ "$1" != "--execute" ]; then
+    DRY_RUN=" --dry-run"
+fi
 
-restore_volume () {
-    date_tag=$(date '+%Y-%m-%d_%H-%M-%S')
-    
-    volume_name=$1
-    archive_name=$2
-    
-    echo -n "Restoring $volume_name"
-
-    docker run  --rm\
-                -v $archive_name:/archive.tar.gz:ro \
-                -v $volume_name:/restore_target \
-                ubuntu \
-                tar xf /archive.tar.gz -C /restore_target .
-
-    echo -e "\t\t\tDONE"
+get_latest_archive() {
+    borg list "$1" --short | sort | tail -n 1
 }
 
-clear_vloume() {
-    volume_name=$1
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-    echo -n "Clearing $volume_name"
+#
+# Settings
+#
+BORG_REPO_BASE=/nfs_shares/backup/borgbackup
+BORG_REPO_NC="nextcloud"
+BORG_REPO_DB="nextcloud_db"
 
-    docker run --rm \
-        -v $1:/restore_target ubuntu bash \
-        -c "rm -Rf /restore_target/*"
+RESTORE_BASE_DIR="${SCRIPT_DIR}/restore"
+RESTORE_NC_DIR="${RESTORE_BASE_DIR}/${BORG_REPO_NC}"
+RESTORE_DB_DIR="${RESTORE_BASE_DIR}/${BORG_REPO_DB}"
 
-    echo -e "\t\t\tDONE"
-}
+#
+# Cleanup restore directory
+#
+sudo rm -Rf ${RESTORE_BASE_DIR}
+mkdir -p ${RESTORE_NC_DIR}
+mkdir -p ${RESTORE_DB_DIR}
 
-clear_vloume nextcloud_db
-restore_volume nextcloud_db ${BACKUP_FOLDER}/nc_db_backup_latest.tar.gz
+#
+# Restore Nextcloud from borg
+#
+LATEST_ARCHIVE=$(get_latest_archive "${BORG_REPO_BASE}/${BORG_REPO_NC}")
+echo "Restoring Nextcloud from archive: ${LATEST_ARCHIVE}"
 
-clear_vloume nextcloud
-restore_volume nextcloud ${BACKUP_FOLDER}/nc_backup_latest.tar.gz
+cd ${RESTORE_NC_DIR}
+sudo borg extract --progress ${BORG_REPO_BASE}/${BORG_REPO_NC}::${LATEST_ARCHIVE} ${DRY_RUN}
+
+#
+# Restore Nextcloud database from borg
+#
+LATEST_ARCHIVE=$(get_latest_archive "${BORG_REPO_BASE}/${BORG_REPO_DB}")
+echo "Restoring Nextcloud database from archive: ${LATEST_ARCHIVE}"
+cd ${RESTORE_DB_DIR}
+sudo borg extract --progress ${BORG_REPO_BASE}/${BORG_REPO_DB}::${LATEST_ARCHIVE} ${DRY_RUN}
+
+# Back to script directory
+cd ${SCRIPT_DIR}
