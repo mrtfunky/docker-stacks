@@ -1,5 +1,52 @@
 #!/bin/bash
 
+#
+# Get parameters
+#
+DO_JELLYFIN=1
+DO_NEXTCLOUD=1
+DO_PAPERLESS=1
+DO_TRAEFIK=1
+DO_VAULTWARDEN=1
+
+# Only jellyfin
+if [ "$1" == "--jellyfin" ]; then
+    DO_JELLYFIN=1
+    DO_NEXTCLOUD=0
+    DO_PAPERLESS=0
+    DO_TRAEFIK=0
+    DO_VAULTWARDEN=0
+# Only nextcloud
+elif [ "$1" == "--nextcloud" ]; then
+    DO_JELLYFIN=0
+    DO_NEXTCLOUD=1
+    DO_PAPERLESS=0
+    DO_TRAEFIK=0
+    DO_VAULTWARDEN=0
+# Only paperless
+elif [ "$1" == "--paperless" ]; then
+    DO_JELLYFIN=0
+    DO_NEXTCLOUD=0
+    DO_PAPERLESS=1
+    DO_TRAEFIK=0
+    DO_VAULTWARDEN=0
+# Only traefik
+elif [ "$1" == "--traefik" ]; then
+    DO_JELLYFIN=0
+    DO_NEXTCLOUD=0
+    DO_PAPERLESS=0
+    DO_TRAEFIK=1
+    DO_VAULTWARDEN=0
+# Only vaultwarden
+elif [ "$1" == "--vaultwarden" ]; then
+    DO_JELLYFIN=0
+    DO_NEXTCLOUD=0
+    DO_PAPERLESS=0
+    DO_TRAEFIK=0
+    DO_VAULTWARDEN=1
+fi
+
+
 # Get the directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -36,6 +83,7 @@ initialize_repo() {
 #   1. Volume name
 create_archive() {
     local volume_name=$1
+
     
     local timestamp=$(date +%Y-%m-%d_%H-%M-%S)
     local repository_path=${REPO_PATH}/${volume_name}
@@ -60,8 +108,17 @@ create_archive() {
 # Prune old backups
 # Arguments:
 #   1. Volume name
+#   2. Number of daily backups to keep
+#   3. Number of weekly backups to keep
+#   4. Number of monthly backups to keep
+#   5. Number of yearly backups to keep
 prune_backups() {
     local volume_name=$1
+    local daily_backups=$2
+    local weekly_backups=$3
+    local monthly_backups=$4
+    local yearly_backups=$5
+    
     local repository_path=${REPO_PATH}/${volume_name}
 
     echo "Pruning old backups for volume $volume_name..."
@@ -73,10 +130,10 @@ prune_backups() {
         mrt/borgbackup prune \
             --list \
             --show-rc \
-            --keep-daily=7 \
-            --keep-weekly=4 \
-            --keep-monthly=6 \
-            --keep-yearly=2
+            --keep-daily=${daily_backups} \
+            --keep-weekly=${weekly_backups} \
+            --keep-monthly=${monthly_backups} \
+            --keep-yearly=${yearly_backups}
     
     # Compact the repository
     echo "Compacting repository for volume $volume_name..."
@@ -124,48 +181,76 @@ unpause_compose() {
 # Create backup for volume
 # Arguments:
 #   1. Volume name
+#   2. Number of daily backups to keep
+#   3. Number of weekly backups to keep
+#   4. Number of monthly backups to keep
+#   5. Number of yearly backups to keep
 create_backup() {
     local volume_name=$1
+    local daily_backups=$2
+    local weekly_backups=$3
+    local monthly_backups=$4
+    local yearly_backups=$5
 
     initialize_repo ${volume_name}
     create_archive  ${volume_name}
-    prune_backups   ${volume_name}
+    prune_backups   ${volume_name} ${daily_backups} ${weekly_backups} ${monthly_backups} ${yearly_backups}
 }
 
 #
 # Nextcloud
 #
-pause_compose   nextcloud
-create_backup   nextcloud
-create_backup   nextcloud_db
-unpause_compose nextcloud
+if [ $DO_NEXTCLOUD -eq 1 ]; then
+    pause_compose   nextcloud
+
+    create_backup   nextcloud      7 4 6 2
+    create_backup   nextcloud_db   7 4 6 2
+
+    unpause_compose nextcloud
+fi
 
 #
 # Jellyfin
 #
-pause_compose   jellyfin
-create_backup   jellyfin
-unpause_compose jellyfin
+if [ $DO_JELLYFIN -eq 1 ]; then
+    pause_compose   jellyfin
+
+    create_backup   jellyfin_data  3 0 0 0
+
+    unpause_compose jellyfin
+fi
 
 #
 # Paperless
 #
-pause_compose paperless
-create_backup paperless_db
-create_backup perless_data
-unpause_compose paperless
+if [ $DO_PAPERLESS -eq 1 ]; then
+    pause_compose paperless
+
+    create_backup paperless_db  7 4 6 2
+    create_backup perless_data  7 4 6 2
+
+    unpause_compose paperless
+fi
 
 #
 # Treafik
 #
-pause_compose   traefik
-create_backup   traefik_certs
-create_backup   traefik_config  
-unpause_compose traefik
+if [ $DO_TRAEFIK -eq 1 ]; then
+    pause_compose   traefik
+
+    create_backup   traefik_certs    7 4 6 2
+    create_backup   traefik_config   7 4 6 2
+
+    unpause_compose traefik
+fi
 
 #
 # Vaultwarden
 #
-pause_compose   vaultwarden
-create_backup   vaultwarden_data
-unpause_compose vaultwarden
+if [ $DO_VAULTWARDEN -eq 1 ]; then
+    pause_compose   vaultwarden
+
+    create_backup   vaultwarden_data   7 4 6 2
+    
+    unpause_compose vaultwarden
+fi
