@@ -1,3 +1,8 @@
+#
+# JELLYFIN
+#
+# JELLYFIN_DATA      - overrides the default volume jellyfin_data
+#
 volumes:
   nas_photos:
     external: true
@@ -20,7 +25,7 @@ services:
       - TZ=Etc/UTC
       - JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
     volumes:
-      - jellyfin_data:/config
+      - ${JELLYFIN_DATA:-jellyfin_data}:/config
       - nas_photos:/data/synology_photos:ro
       - nas_music:/data/synology_music:ro
       - nas_audiobooks:/data/nas_audiobooks:ro
