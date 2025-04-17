@@ -8,6 +8,7 @@ DO_NEXTCLOUD=1
 DO_PAPERLESS=1
 DO_TRAEFIK=1
 DO_VAULTWARDEN=1
+DO_AUDIOBOOKSHELF=1
 
 # Only jellyfin
 if [ "$1" == "--jellyfin" ]; then
@@ -16,6 +17,7 @@ if [ "$1" == "--jellyfin" ]; then
     DO_PAPERLESS=0
     DO_TRAEFIK=0
     DO_VAULTWARDEN=0
+    DO_AUDIOBOOKSHELF=0
 # Only nextcloud
 elif [ "$1" == "--nextcloud" ]; then
     DO_JELLYFIN=0
@@ -23,6 +25,7 @@ elif [ "$1" == "--nextcloud" ]; then
     DO_PAPERLESS=0
     DO_TRAEFIK=0
     DO_VAULTWARDEN=0
+    DO_AUDIOBOOKSHELF=0
 # Only paperless
 elif [ "$1" == "--paperless" ]; then
     DO_JELLYFIN=0
@@ -30,6 +33,7 @@ elif [ "$1" == "--paperless" ]; then
     DO_PAPERLESS=1
     DO_TRAEFIK=0
     DO_VAULTWARDEN=0
+    DO_AUDIOBOOKSHELF=0
 # Only traefik
 elif [ "$1" == "--traefik" ]; then
     DO_JELLYFIN=0
@@ -37,6 +41,7 @@ elif [ "$1" == "--traefik" ]; then
     DO_PAPERLESS=0
     DO_TRAEFIK=1
     DO_VAULTWARDEN=0
+    DO_AUDIOBOOKSHELF=0
 # Only vaultwarden
 elif [ "$1" == "--vaultwarden" ]; then
     DO_JELLYFIN=0
@@ -44,6 +49,15 @@ elif [ "$1" == "--vaultwarden" ]; then
     DO_PAPERLESS=0
     DO_TRAEFIK=0
     DO_VAULTWARDEN=1
+    DO_AUDIOBOOKSHELF=0
+# Only audiobookshelf
+elif [ "$1" == "--audiobookshelf" ]; then
+    DO_JELLYFIN=0
+    DO_NEXTCLOUD=0
+    DO_PAPERLESS=0
+    DO_TRAEFIK=0
+    DO_VAULTWARDEN=0
+    DO_AUDIOBOOKSHELF=1
 fi
 
 
@@ -253,4 +267,16 @@ if [ $DO_VAULTWARDEN -eq 1 ]; then
     create_backup   vaultwarden_data   7 4 6 2
     
     unpause_compose vaultwarden
+fi
+
+#
+# Audiobookshelf
+#
+if [ $DO_AUDIOBOOKSHELF -eq 1 ]; then
+    pause_compose   audiobookshelf
+
+    create_backup   audiobookshelf_config      3 1 1 0
+    create_backup   audiobookshelf_metadata    3 1 1 0
+    
+    unpause_compose audiobookshelf
 fi
