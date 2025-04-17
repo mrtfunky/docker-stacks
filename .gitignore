@@ -4,9 +4,6 @@
 /scripts
 /backup_stacks.sh
 .env
-/nextcloud/backup_nextcloud.sh
-/traefik/backup_traefik.sh
-/paperless/backup_paperless.sh
 /piwigo
 /jellyfin/data
 /mariadb_digikam
