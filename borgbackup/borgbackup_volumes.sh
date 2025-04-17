@@ -226,8 +226,8 @@ fi
 if [ $DO_PAPERLESS -eq 1 ]; then
     pause_compose paperless
 
-    create_backup paperless_db  7 4 6 2
-    create_backup perless_data  7 4 6 2
+    create_backup paperless_db    7 4 6 2
+    create_backup paperless_data  7 4 6 2
 
     unpause_compose paperless
 fi
