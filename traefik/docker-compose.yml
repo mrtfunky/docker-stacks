@@ -1,3 +1,10 @@
+#
+# Traefik
+#
+# VOLUME_CERTS       - override the default certs directory
+# VOLUME_CONFIG      - override the default config directory
+#
+
 volumes:
   traefik_certs:
     external: true
@@ -38,8 +45,8 @@ services:
       - vaultwarden_net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - traefik_certs:/etc/traefik/certs
-      - traefik_config:/etc/traefik/dynamic_conf
+      - ${VOLUME_CERTS:-traefik_certs}:/etc/traefik/certs
+      - ${VOLUME_CONFIG:-traefik_config}:/etc/traefik/dynamic_conf
 
   whoami:
     image: "traefik/whoami"
