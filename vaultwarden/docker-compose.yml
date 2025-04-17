@@ -1,3 +1,9 @@
+#
+# Vaultwarden
+#
+# VOLUME_DATA       - override the default data directory
+#
+
 volumes:
     vaultwarden_data:
         external: true
@@ -23,7 +29,7 @@ services:
             - /etc/localtime:/etc/localtime:ro
             - /etc/timezone:/etc/timezone:ro
         volumes:
-            - vaultwarden_data:/data
+            - ${VOLUME_DATA:-vaultwarden_data}:/data
         labels:
             - "traefik.enable=true"
 
