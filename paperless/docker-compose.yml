@@ -1,6 +1,9 @@
 #
 # paperless-ngx
 #
+# PAPERLESS_DATA      - overrides the default volume paperless_data
+# PAPERLESS_DB        - overrides the default volume paperless_db
+#
 volumes:
   paperless_data:
     external: true
@@ -32,7 +35,7 @@ services:
     networks:
       - paperless_net
     volumes:
-      - paperless_db:/var/lib/postgresql/data
+      - ${PAPERLESS_DB:-paperless_db}:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: ${DB_DB}
       POSTGRES_USER: ${DB_USER}
@@ -62,7 +65,7 @@ services:
       
       - "traefik.http.middlewares.paperless-https.redirectscheme.scheme=https"
     volumes:
-      - paperless_data:/usr/src/paperless/data
+      - ${PAPERLESS_DATA:-paperless_data}:/usr/src/paperless/data
       - paperless_media:/usr/src/paperless/media
       - paperless_export:/usr/src/paperless/export
       - paperless_consume:/usr/src/paperless/consume
