@@ -5,6 +5,50 @@ docker_cmd=/usr/bin/docker
 # Get the directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+
+# Read parameters
+# --pull: pull only
+# --stop: stop only
+# --start: start only
+# --restart: stop and start
+# --all: pull, stop and start
+do_pull=true
+do_stop=true
+do_start=true
+
+if [ $# -eq 0 ]; then
+    do_pull=true
+    do_stop=true
+    do_start=true
+elif [ $# -gt 1 ]; then
+    echo "Usage: $0 [--pull | --stop | --start | --restart | --all]"
+    exit 1
+elif [ "$1" = "--pull" ]; then
+    do_pull=true
+    do_stop=false
+    do_start=false
+elif [ "$1" = "--stop" ]; then
+    do_pull=false
+    do_stop=true
+    do_start=false
+elif [ "$1" = "--start" ]; then
+    do_pull=false
+    do_stop=false
+    do_start=true
+elif [ "$1" = "--restart" ]; then
+    do_pull=false
+    do_stop=true
+    do_start=true
+elif [ "$1" = "--all" ]; then
+    do_pull=true
+    do_stop=true
+    do_start=true
+else
+    echo "Unknown option: $1"
+    exit 1
+fi
+
+
 # Stack list
 source ${SCRIPT_DIR}/stacks.sh
 
@@ -70,9 +114,20 @@ start_stacks(){
     done
 }
 
-pull_stacks $stacks
-stop_stacks $stacks
-start_stacks $stacks
+if [ "$do_pull" = true ]; then
+    echo "Pulling stacks"
+    pull_stacks $stacks
+fi
+
+if [ "$do_stop" = true ]; then
+    echo "Stopping stacks"
+    stop_stacks $stacks
+fi
+
+if [ "$do_start" = true ]; then
+    echo "Starting stacks"
+    start_stacks $stacks
+fi
 
 echo "Remove unused docker images"
 ${docker_cmd} image prune -f
