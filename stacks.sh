@@ -5,4 +5,5 @@ stacks=(\
     "jellyfin"
     "vaultwarden"
     "audiobookshelf"
+    "immich-app"
 )

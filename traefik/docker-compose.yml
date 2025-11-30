@@ -20,6 +20,8 @@ networks:
     external: true
   traefik_net:
     external: true
+  immich_net:
+    external: true
 
 services:
   traefik:
@@ -43,6 +45,7 @@ services:
       - nextcloud_net
       - paperless_net
       - vaultwarden_net
+      - immich_net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - ${VOLUME_CERTS:-traefik_certs}:/etc/traefik/certs

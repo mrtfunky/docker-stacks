@@ -127,7 +127,7 @@ fi
 if [ "$do_start" = true ]; then
     echo "Starting stacks"
     start_stacks $stacks
-fi
 
-echo "Remove unused docker images"
-${docker_cmd} image prune -f
+    echo "Removing unused docker images"
+    ${docker_cmd} image prune -f
+fi
