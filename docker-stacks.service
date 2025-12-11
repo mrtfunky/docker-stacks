@@ -1,0 +1,22 @@
+# /etc/systemd/system/docker-compose-nextcloud.service
+
+[Unit]
+Description=My Docker Compose Stacks Service
+Requires=docker.service
+After=network-online.target \
+    docker.service
+
+RequiresMountsFor=*
+
+Wants=network-online.target
+StartLimitIntervalSec=60
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/karl/docker-stacks
+ExecStart=/home/karl/docker-stacks/start_stacks.sh
+ExecStop=/home/karl/docker-stacks/stop_stacks.sh
+
+[Install]
+WantedBy=multi-user.target

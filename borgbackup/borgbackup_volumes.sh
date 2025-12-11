@@ -65,9 +65,10 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Rository base path
-REPO_PATH=/nfs_shares/backup/borgbackup
+REPO_PATH=/nfs_shares/backup/homer/borgbackup
 # Repostory base path for testing
 #REPO_PATH=${SCRIPT_DIR}/borgbackup_test
+
 
 # Initialize repository if does not exist
 # Arguments:
@@ -265,7 +266,7 @@ if [ $DO_VAULTWARDEN -eq 1 ]; then
     pause_compose   vaultwarden
 
     create_backup   vaultwarden_data   7 4 6 2
-    
+
     unpause_compose vaultwarden
 fi
 
@@ -277,6 +278,6 @@ if [ $DO_AUDIOBOOKSHELF -eq 1 ]; then
 
     create_backup   audiobookshelf_config      3 1 1 0
     create_backup   audiobookshelf_metadata    3 1 1 0
-    
+
     unpause_compose audiobookshelf
 fi

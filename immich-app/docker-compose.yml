@@ -18,7 +18,7 @@ services:
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - ${UPLOAD_LOCATION}:/data
       - nas_photos:/mnt/media/synology_photos:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
@@ -58,7 +58,7 @@ services:
     #   file: hwaccel.ml.yml
     #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
-      - model-cache:/cache
+      - immich-model-cache:/cache
     env_file:
       - .env
     restart: no
@@ -96,8 +96,9 @@ services:
       - immich_net
 
 volumes:
-  model-cache:
   nas_photos:
+    external: true
+  immich-model-cache:
     external: true
   immich-redis:
     external: true
