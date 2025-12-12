@@ -10,6 +10,7 @@ BACKUP_DESTINATION=${SCRIPT_DIR}/mnt_backup
 #   HOST - NFS host
 #   REPO_PATH - NFS export path
 #   FOLDERS_TO_BACKUP - Array of folders to back up with retention policies (e.g. "/path/to/folder:7:3:6:1")
+#   STASKS_TO_STOP - Array of stack names to stop before backup (e.g. "jellyfin", "paperless")
 source ${SCRIPT_DIR}/borgbackup_config.sh
 
 # Mount remote backup location via NFS
@@ -148,10 +149,40 @@ prune_backups() {
     fi
 }
 
+#
+# Stop stacks before backup
+#
+stop_stacks() {
+    echo "Stopping stacks before backup..."
+
+    for stack in "${STASKS_TO_STOP[@]}"; do
+        echo "Stopping stack: ${stack}"
+        docker-compose -f ${SCRIPT_DIR}/../${stack}/docker-compose.yml down
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to stop stack ${stack}."
+            exit 1
+        fi
+    done
+}
+
+#
+# Start stacks after backup
+#
+start_stacks() {
+    echo "Starting stacks after backup..."
+
+    for stack in "${STASKS_TO_STOP[@]}"; do
+        echo "Starting stack: ${stack}"
+        docker-compose -f ${SCRIPT_DIR}/../${stack}/docker-compose.yml up -d
+    done
+}
+
 
 ###############################################################
 # Main script execution
 ###############################################################
+
+stop_stacks
 
 mount_backup_location
 
@@ -164,6 +195,8 @@ for folder in "${FOLDERS_TO_BACKUP[@]}"; do
 done
 
 unmount_backup_location
+
+start_stacks
 
 ###############################################################
 # Main script execution end
