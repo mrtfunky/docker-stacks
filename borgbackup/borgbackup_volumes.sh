@@ -224,16 +224,16 @@ if [ $DO_NEXTCLOUD -eq 1 ]; then
     unpause_compose nextcloud
 fi
 
+# #
+# # Jellyfin
+# #
+# if [ $DO_JELLYFIN -eq 1 ]; then
+#     pause_compose   jellyfin
 #
-# Jellyfin
+#     create_backup   jellyfin_data  3 0 0 0
 #
-if [ $DO_JELLYFIN -eq 1 ]; then
-    pause_compose   jellyfin
-
-    create_backup   jellyfin_data  3 0 0 0
-
-    unpause_compose jellyfin
-fi
+#     unpause_compose jellyfin
+# fi
 
 #
 # Paperless
@@ -259,25 +259,25 @@ if [ $DO_TRAEFIK -eq 1 ]; then
     unpause_compose traefik
 fi
 
+# #
+# # Vaultwarden
+# #
+# if [ $DO_VAULTWARDEN -eq 1 ]; then
+#     pause_compose   vaultwarden
 #
-# Vaultwarden
+#     create_backup   vaultwarden_data   7 4 6 2
 #
-if [ $DO_VAULTWARDEN -eq 1 ]; then
-    pause_compose   vaultwarden
+#     unpause_compose vaultwarden
+# fi
 
-    create_backup   vaultwarden_data   7 4 6 2
-
-    unpause_compose vaultwarden
-fi
-
+# #
+# # Audiobookshelf
+# #
+# if [ $DO_AUDIOBOOKSHELF -eq 1 ]; then
+#     pause_compose   audiobookshelf
 #
-# Audiobookshelf
+#     create_backup   audiobookshelf_config      3 1 1 0
+#     create_backup   audiobookshelf_metadata    3 1 1 0
 #
-if [ $DO_AUDIOBOOKSHELF -eq 1 ]; then
-    pause_compose   audiobookshelf
-
-    create_backup   audiobookshelf_config      3 1 1 0
-    create_backup   audiobookshelf_metadata    3 1 1 0
-
-    unpause_compose audiobookshelf
-fi
+#     unpause_compose audiobookshelf
+# fi

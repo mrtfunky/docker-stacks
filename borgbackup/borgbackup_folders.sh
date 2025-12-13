@@ -157,7 +157,7 @@ stop_stacks() {
 
     for stack in "${STASKS_TO_STOP[@]}"; do
         echo "Stopping stack: ${stack}"
-        docker-compose -f ${SCRIPT_DIR}/../${stack}/docker-compose.yml down
+        docker compose -f ${SCRIPT_DIR}/../${stack}/docker-compose.yml down
         if [ $? -ne 0 ]; then
             echo "Error: Failed to stop stack ${stack}."
             exit 1
@@ -173,7 +173,7 @@ start_stacks() {
 
     for stack in "${STASKS_TO_STOP[@]}"; do
         echo "Starting stack: ${stack}"
-        docker-compose -f ${SCRIPT_DIR}/../${stack}/docker-compose.yml up -d
+        docker compose -f ${SCRIPT_DIR}/../${stack}/docker-compose.yml up -d
     done
 }
 
