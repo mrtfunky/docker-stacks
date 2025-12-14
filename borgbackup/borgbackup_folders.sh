@@ -13,49 +13,8 @@ BACKUP_DESTINATION=${SCRIPT_DIR}/mnt_backup
 #   STASKS_TO_STOP - Array of stack names to stop before backup (e.g. "jellyfin", "paperless")
 source ${SCRIPT_DIR}/borgbackup_config.sh
 
-# Mount remote backup location via NFS
-#
-# Mounts the remote NFS backup location to the local BACKUP_DESTINATION directory.
-# No parameters.
-mount_backup_location() {
-    # if mount point does not exist, create it
-    if [ ! -d "${BACKUP_DESTINATION}" ]; then
-        mkdir -p "${BACKUP_DESTINATION}"
-    fi
-    
-    # if not already mounted, mount it
-    if mountpoint -q "${BACKUP_DESTINATION}"; then
-        echo "Backup location already mounted."
-        return
-    fi
-
-    echo "Mounting remote backup location..."
-    mount -t nfs ${HOST}:${REPO_PATH} ${BACKUP_DESTINATION}
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to mount NFS backup location at ${BACKUP_DESTINATION}."
-        exit 1
-    fi
-}
-
-#
-# Unmount remote backup location
-#
-# Unmounts the remote NFS backup location from the local BACKUP_DESTINATION directory.
-# No parameters.
-unmount_backup_location() {
-    # Check if already unmounted
-    if ! mountpoint -q "${BACKUP_DESTINATION}"; then
-        echo "Backup location already unmounted."
-        return
-    fi
-    
-    echo "Unmounting remote backup location..."
-    umount "${BACKUP_DESTINATION}"
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to unmount ${BACKUP_DESTINATION}."
-        exit 1
-    fi
-}
+# Import helper functions
+source ${SCRIPT_DIR}/borg_helpers.sh
 
 #
 # Create bor repository under mount point
@@ -184,7 +143,7 @@ start_stacks() {
 
 stop_stacks
 
-mount_backup_location
+mount_backup_location "${BACKUP_DESTINATION}"
 
 for folder in "${FOLDERS_TO_BACKUP[@]}"; do
     IFS=':' read -r folder_path daily weekly monthly yearly <<< "${folder}"
@@ -194,7 +153,7 @@ for folder in "${FOLDERS_TO_BACKUP[@]}"; do
     prune_backups     "${folder_path}" ${daily} ${weekly} ${monthly} ${yearly}
 done
 
-unmount_backup_location
+unmount_backup_location "${BACKUP_DESTINATION}"
 
 start_stacks
 

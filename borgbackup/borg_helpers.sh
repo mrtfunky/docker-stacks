@@ -49,3 +49,47 @@ restore_from_borg() {
     # Return to the original directory
     cd ${current_dir}
 }
+
+# Mount remote backup location via NFS
+#
+# Mounts the remote NFS backup location to the local BACKUP_DESTINATION directory.
+# No parameters.
+mount_backup_location() {
+    # if mount point does not exist, create it
+    if [ ! -d "${BACKUP_DESTINATION}" ]; then
+        mkdir -p "${BACKUP_DESTINATION}"
+    fi
+    
+    # if not already mounted, mount it
+    if mountpoint -q "${BACKUP_DESTINATION}"; then
+        echo "Backup location already mounted."
+        return
+    fi
+
+    echo "Mounting remote backup location..."
+    mount -t nfs ${HOST}:${REPO_PATH} ${BACKUP_DESTINATION}
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to mount NFS backup location at ${BACKUP_DESTINATION}."
+        exit 1
+    fi
+}
+
+#
+# Unmount remote backup location
+#
+# Unmounts the remote NFS backup location from the local BACKUP_DESTINATION directory.
+# No parameters.
+unmount_backup_location() {
+    # Check if already unmounted
+    if ! mountpoint -q "${BACKUP_DESTINATION}"; then
+        echo "Backup location already unmounted."
+        return
+    fi
+    
+    echo "Unmounting remote backup location..."
+    umount "${BACKUP_DESTINATION}"
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to unmount ${BACKUP_DESTINATION}."
+        exit 1
+    fi
+}
