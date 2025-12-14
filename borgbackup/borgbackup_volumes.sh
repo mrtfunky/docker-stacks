@@ -212,17 +212,17 @@ create_backup() {
     prune_backups   ${volume_name} ${daily_backups} ${weekly_backups} ${monthly_backups} ${yearly_backups}
 }
 
+# #
+# # Nextcloud
+# #
+# if [ $DO_NEXTCLOUD -eq 1 ]; then
+#     pause_compose   nextcloud
 #
-# Nextcloud
+#     create_backup   nextcloud      7 4 6 2
+#     create_backup   nextcloud_db   7 4 6 2
 #
-if [ $DO_NEXTCLOUD -eq 1 ]; then
-    pause_compose   nextcloud
-
-    create_backup   nextcloud      7 4 6 2
-    create_backup   nextcloud_db   7 4 6 2
-
-    unpause_compose nextcloud
-fi
+#     unpause_compose nextcloud
+# fi
 
 # #
 # # Jellyfin
@@ -235,29 +235,29 @@ fi
 #     unpause_compose jellyfin
 # fi
 
+# #
+# # Paperless
+# #
+# if [ $DO_PAPERLESS -eq 1 ]; then
+#     pause_compose paperless
 #
-# Paperless
+#     create_backup paperless_db    7 4 6 2
+#     create_backup paperless_data  7 4 6 2
 #
-if [ $DO_PAPERLESS -eq 1 ]; then
-    pause_compose paperless
+#     unpause_compose paperless
+# fi
 
-    create_backup paperless_db    7 4 6 2
-    create_backup paperless_data  7 4 6 2
-
-    unpause_compose paperless
-fi
-
+# #
+# # Treafik
+# #
+# if [ $DO_TRAEFIK -eq 1 ]; then
+#     pause_compose   traefik
 #
-# Treafik
+#     create_backup   traefik_certs    7 4 6 2
+#     create_backup   traefik_config   7 4 6 2
 #
-if [ $DO_TRAEFIK -eq 1 ]; then
-    pause_compose   traefik
-
-    create_backup   traefik_certs    7 4 6 2
-    create_backup   traefik_config   7 4 6 2
-
-    unpause_compose traefik
-fi
+#     unpause_compose traefik
+# fi
 
 # #
 # # Vaultwarden

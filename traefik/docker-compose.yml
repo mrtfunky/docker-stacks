@@ -1,15 +1,6 @@
 #
 # Traefik
 #
-# VOLUME_CERTS       - override the default certs directory
-# VOLUME_CONFIG      - override the default config directory
-#
-
-volumes:
-  traefik_certs:
-    external: true
-  traefik_config:
-    external: true
 
 networks:
   nextcloud_net:
@@ -48,8 +39,8 @@ services:
       - immich_net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - ${VOLUME_CERTS:-traefik_certs}:/etc/traefik/certs
-      - ${VOLUME_CONFIG:-traefik_config}:/etc/traefik/dynamic_conf
+      - /docker_volumes/traefik_certs:/etc/traefik/certs
+      - /docker_volumes/traefik_config:/etc/traefik/dynamic_conf
 
   whoami:
     image: "traefik/whoami"

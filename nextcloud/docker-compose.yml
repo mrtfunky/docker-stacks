@@ -1,15 +1,8 @@
 #
 # NEXTCLOUD
 #
-# NEXTCLOUD_VOLUME      - overrides the default volume nextcloud
-# NEXTCLOUD_VOLUME_DB   - overrides the default volume nextcloud_db
-#
 
 volumes:
-  nextcloud:
-    external: true
-  nextcloud_db:
-    external: true
   nextcloud_data:
     external: true
   paperless_media:
@@ -27,7 +20,7 @@ services:
     restart: "no"
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
-      - ${NEXTCLOUD_VOLUME_DB:-nextcloud_db}:/var/lib/mysql
+      - /docker_volumes/nextcloud_db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_PASSWORD=${DB_PASSWORD}
@@ -84,8 +77,8 @@ services:
       - db
       - redis
     volumes:
-      - ${NEXTCLOUD_VOLUME:-nextcloud}:/var/www/html
-      - ${NEXTCLOUD_VOLUME_DATA:-nextcloud_data}:/var/www/html/data
+      - /docker_volumes/nextcloud:/var/www/html
+      - nextcloud_data:/var/www/html/data
       
       # Paperless documents and consume folder. Skip if you don't use paperless
       - paperless_media:/external/paperless_media
@@ -106,8 +99,8 @@ services:
     image: nextcloud:latest
     restart: "no"
     volumes:
-      - ${NEXTCLOUD_VOLUME:-nextcloud}:/var/www/html
-      - ${NEXTCLOUD_VOLUME_DATA:-nextcloud_data}:/var/www/html/data
+      - /docker_volumes/nextcloud:/var/www/html
+      - nextcloud_data:/var/www/html/data
     entrypoint: /cron.sh
     depends_on:
       - db

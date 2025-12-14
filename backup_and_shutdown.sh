@@ -3,7 +3,6 @@
 # Get the directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$SCRIPT_DIR/borgbackup/borgbackup_volumes.sh
 sudo $SCRIPT_DIR/borgbackup/borgbackup_folders.sh
 
 exit 0
