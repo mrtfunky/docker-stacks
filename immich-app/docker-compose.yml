@@ -102,10 +102,6 @@ volumes:
     external: true
   immich-redis:
     external: true
-  immich-library:
-    external: true
-  immich-postgres:
-    external: true
 
 networks:
   immich_net:
