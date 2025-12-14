@@ -10,11 +10,16 @@ source ${SCRIPT_DIR}/borgbackup_config.sh
 # Import helper functions
 source ${SCRIPT_DIR}/borg_helpers.sh
 
-# Funnction to list folders backups on the remote backup location
+# Funnction to list stats and folders backups on the remote backup location
 # Parameters:
 #   repo_name - Name of the repository to list backups for
 list_backups() {
     local repo_name=$1
+
+    echo "##################################################"
+    echo "Repository: ${repo_name}"
+    echo "##################################################"
+    borg info ${BACKUP_DESTINATION}/${repo_name}
     borg list ${BACKUP_DESTINATION}/${repo_name}
 }
 
@@ -29,10 +34,7 @@ for folder_entry in "${FOLDERS_TO_BACKUP[@]}"; do
     # Derive repository name from folder path
     repo_name=$(basename "${folder_path}")
     
-    echo "----------------------------------------"
-    echo "Repository: ${repo_name}"
     list_backups "${repo_name}"
-    echo "----------------------------------------"
 done
 
 unmount_backup_location "${BACKUP_DESTINATION}"
