@@ -92,4 +92,7 @@ unmount_backup_location() {
         echo "Error: Failed to unmount ${BACKUP_DESTINATION}."
         exit 1
     fi
+
+    # Cleanup mount point directory
+    rmdir "${BACKUP_DESTINATION}"
 }

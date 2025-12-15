@@ -14,9 +14,9 @@ StartLimitIntervalSec=60
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=/home/karl/docker-stacks
-ExecStart=/home/karl/docker-stacks/start_stacks.sh
-ExecStop=/home/karl/docker-stacks/stop_stacks.sh
+WorkingDirectory=/nfs_exports/karl/docker-stacks
+ExecStart=/nfs_exports/karl/docker-stacks/start_stacks.sh
+ExecStop=/nfs_exports/karl/docker-stacks/stop_stacks.sh
 
 [Install]
 WantedBy=multi-user.target

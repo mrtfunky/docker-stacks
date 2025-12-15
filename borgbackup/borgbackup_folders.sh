@@ -1,9 +1,15 @@
 #!/bin/bash
 
+# Check if script is run as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root. Please use sudo."
+    exit 1
+fi
+
 # Determine script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Local mount point for NFS
-BACKUP_DESTINATION=${SCRIPT_DIR}/mnt_backup
+# Mount point for NFS in the temp directory
+BACKUP_DESTINATION="/tmp/borgbackup_nfs_mount"
 
 # Import or define configuration and folder list
 # Needs to define:
@@ -138,7 +144,7 @@ start_stacks() {
 
 
 ###############################################################
-# Main script execution
+# Backup docker volumes
 ###############################################################
 
 stop_stacks
@@ -158,8 +164,15 @@ unmount_backup_location "${BACKUP_DESTINATION}"
 start_stacks
 
 ###############################################################
-# Main script execution end
+# Backup folders not belonging to docker stacks
 ###############################################################
+
+
+
+###############################################################
+# Final status check
+###############################################################
+
 
 # Check if script executed successfully
 if [ $? -eq 0 ]; then

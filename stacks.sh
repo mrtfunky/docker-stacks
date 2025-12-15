@@ -1,9 +1,10 @@
 stacks=(\
-    "traefik"
-    "nextcloud"
-    "paperless"
-    "jellyfin"
-    "vaultwarden"
     "audiobookshelf"
     "immich-app"
+    "jellyfin"
+    "nextcloud"
+    "paperless"
+    "portainer"
+    "traefik"
+    "vaultwarden"
 )
