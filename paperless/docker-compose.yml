@@ -2,8 +2,6 @@
 # paperless-ngx
 #
 volumes:
-  paperless_media:
-    external: true
   paperless_export:
     external: true
   paperless_consume:
@@ -59,7 +57,7 @@ services:
       - "traefik.http.middlewares.paperless-https.redirectscheme.scheme=https"
     volumes:
       - /docker_volumes/paperless_data:/usr/src/paperless/data
-      - paperless_media:/usr/src/paperless/media
+      - /docker_volumes/paperless_media:/usr/src/paperless/media
       - paperless_export:/usr/src/paperless/export
       - paperless_consume:/usr/src/paperless/consume
       

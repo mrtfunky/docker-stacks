@@ -19,7 +19,7 @@ services:
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/data
-      - nas_photos:/mnt/media/synology_photos:ro
+      - /volume1/photos:/mnt/media/synology_photos:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
@@ -96,8 +96,6 @@ services:
       - immich_net
 
 volumes:
-  nas_photos:
-    external: true
   immich-model-cache:
     external: true
   immich-redis:

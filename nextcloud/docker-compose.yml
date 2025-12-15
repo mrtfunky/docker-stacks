@@ -3,10 +3,6 @@
 #
 
 volumes:
-  nextcloud_data:
-    external: true
-  paperless_media:
-    external: true
   paperless_consume:
     external: true
 
@@ -78,10 +74,10 @@ services:
       - redis
     volumes:
       - /docker_volumes/nextcloud:/var/www/html
-      - nextcloud_data:/var/www/html/data
+      - /docker_volumes/nextcloud_data:/var/www/html/data
       
       # Paperless documents and consume folder. Skip if you don't use paperless
-      - paperless_media:/external/paperless_media
+      - /docker_volumes/paperless_media:/external/paperless_media
       - paperless_consume:/external/paperless_consume
     environment:
       - NEXTCLOUD_ADMIN_USER=${APP_ADMIN_NAME}
@@ -100,7 +96,7 @@ services:
     restart: "no"
     volumes:
       - /docker_volumes/nextcloud:/var/www/html
-      - nextcloud_data:/var/www/html/data
+      - /docker_volumes/nextcloud_data:/var/www/html/data
     entrypoint: /cron.sh
     depends_on:
       - db

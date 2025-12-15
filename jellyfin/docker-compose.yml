@@ -4,10 +4,6 @@
 # JELLYFIN_DATA      - overrides the default volume jellyfin_data
 #
 volumes:
-  nas_photos:
-    external: true
-  nas_music:
-    external: true
   jellyfin_data:
     external: true
 
@@ -25,8 +21,8 @@ services:
     volumes:
       - /docker_volumes/jellyfin_data:/config
 
-      - nas_photos:/data/synology_photos:ro
-      - nas_music:/data/synology_music:ro
+      - /volume1/photos:/data/synology_photos:ro
+      - /volume1/music:/data/synology_music:ro
       - /volume1/movies:/data/movies:ro
       - /volume1/shows:/data/shows:ro
     # ports:
