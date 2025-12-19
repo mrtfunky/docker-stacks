@@ -11,46 +11,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Mount point for NFS in the temp directory
 BACKUP_DESTINATION="/tmp/borgbackup_nfs_mount"
 
-# Parse parameters
-#   --stacks : Backup only docker stacks
-#   --folders: Backup only non-docker-stack folders
-#   --all    : Backup all folders
-#   --status : Check backup status
-BACKUP_STACKS=1
-BACKUP_FOLDERS=1
+BACKUP_STACKS=0
+BACKUP_FOLDERS=0
 BACKUP_STATUS=0
 BACKUP_TODAY=0
-for arg in "$@"; do
-    case $arg in
-        --stacks)
-            BACKUP_STACKS=1
-            BACKUP_FOLDERS=0
-            ;;
-        --folders)
-            BACKUP_STACKS=0
-            BACKUP_FOLDERS=1
-            ;;
-        --all)
-            BACKUP_STACKS=1
-            BACKUP_FOLDERS=1
-            ;;
-        --status)
-            BACKUP_STACKS=0
-            BACKUP_FOLDERS=0
-            BACKUP_STATUS=1
-            ;;
-        --today)
-            BACKUP_STACKS=0
-            BACKUP_FOLDERS=0
-            BACKUP_STATUS=0
-            BACKUP_TODAY=1
-            ;;
-        *)
-            echo "Unknown parameter: $arg"
-            exit 1
-            ;;
-    esac
-done
+
+# Check the name of the link used to invoke the script
+SCRIPT_NAME="$(basename "$0")"
+if [ "$SCRIPT_NAME" = "status" ]; then
+    BACKUP_STATUS=1
+elif [ "$SCRIPT_NAME" = "today" ]; then
+    BACKUP_TODAY=1
+elif [ "$SCRIPT_NAME" = "backup" ]; then
+    BACKUP_STACKS=1
+    BACKUP_FOLDERS=1
+fi
 
 
 # Import or define configuration and folder list
