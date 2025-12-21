@@ -22,6 +22,7 @@ services:
       FTLCONF_dns_domain_name: ${PIHOLE_DOMAIN_NAME}
       FTLCONF_dns_domain_local: true
       FTLCONF_dns_reply_host_IPv4: ${PIHOLE_IP}
+      FTLCONF_dns_interface: ${PIHOLE_NETWORK_INTERFACE}
       # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
       TZ: 'Europe/Berlin'
       # Set a password to access the web interface. Not setting one will result in a random password being assigned

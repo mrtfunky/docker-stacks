@@ -34,6 +34,7 @@ fi
 #   REPO_PATH - NFS export path
 #   FOLDERS_TO_BACKUP - Array of folders to back up with retention policies (e.g. "/path/to/folder:7:3:6:1")
 #   STASKS_TO_STOP - Array of stack names to stop before backup (e.g. "jellyfin", "paperless")
+#   EXTRA_FOLDERS_TO_BACKUP - Array of non-docker-stack folders to back up with retention policies
 source ${SCRIPT_DIR}/borgbackup_config.sh
 
 # Import helper functions
@@ -93,7 +94,6 @@ if [ $BACKUP_STATUS -eq 1 ]; then
         # Extract folder path and retention policies
         IFS=':' read -r folder_path daily weekly monthly yearly <<< "${folder_entry}"
         
-        # Derive repository name from folder path
         repo_name=$(basename "${folder_path}")      
         list_backups "${repo_name}"
     done
@@ -103,7 +103,6 @@ if [ $BACKUP_STATUS -eq 1 ]; then
         # Extract folder path and retention policies
         IFS=':' read -r folder_path daily weekly monthly yearly <<< "${folder_entry}"
 
-        # Derive repository name from folder path
         repo_name=$(basename "${folder_path}")
         list_backups "${repo_name}"
     done
@@ -122,7 +121,6 @@ if [ $BACKUP_TODAY -eq 1 ]; then
         # Extract folder path and retention policies
         IFS=':' read -r folder_path daily weekly monthly yearly <<< "${folder_entry}"
         
-        # Derive repository name from folder path
         repo_name=$(basename "${folder_path}")      
         check_backup_today "${repo_name}"
     done
@@ -132,7 +130,6 @@ if [ $BACKUP_TODAY -eq 1 ]; then
         # Extract folder path and retention policies
         IFS=':' read -r folder_path daily weekly monthly yearly <<< "${folder_entry}"
 
-        # Derive repository name from folder path
         repo_name=$(basename "${folder_path}")
         check_backup_today "${repo_name}"
     done
