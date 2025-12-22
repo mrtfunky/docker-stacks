@@ -247,3 +247,14 @@ check_backup_today() {
         return 1
     fi
 }
+
+# Function sends a success email
+# Parameters:
+#   $1 - Subject
+#   $2 - Body
+send_email() {
+    local subject=$1
+    local body=$2
+
+    echo "${body}" | mail -s "${subject}" ${EMAIL_RECIPIENT}
+}

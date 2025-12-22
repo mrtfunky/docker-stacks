@@ -51,11 +51,11 @@ services:
       - "traefik.http.routers.nextcloud.entrypoints=websecure"
       - "traefik.http.routers.nextcloud.rule=Host(`${APP_HOST_NAME}`)"
       - "traefik.http.routers.nextcloud.tls=true"
-      - "traefik.http.routers.nextcloud.middlewares=nc-rep"
+      - "traefik.http.routers.nextcloud.middlewares=nc-rep,nc-header"
       
       - "traefik.http.routers.nextcloud-http.entrypoints=web"
       - "traefik.http.routers.nextcloud-http.rule=Host(`${APP_HOST_NAME}`)"
-      - "traefik.http.routers.nextcloud-http.middlewares=nextcloud-https,nc-rep"
+      - "traefik.http.routers.nextcloud-http.middlewares=nextcloud-https,nc-rep,nc-header"
 
       - "traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https"
            
@@ -63,10 +63,10 @@ services:
       - "traefik.http.middlewares.nc-rep.redirectregex.replacement=https://$$1/remote.php/dav/"
       - "traefik.http.middlewares.nc-rep.redirectregex.permanent=true"   
       
-      #- "traefik.http.middlewares.nc-header.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.nc-header.headers.stsSeconds=31536000"
       #- "traefik.http.middlewares.nc-header.headers.stsIncludeSubdomains=true"
       #- "traefik.http.middlewares.nc-header.headers.stsPreload=true"
-      #- "traefik.http.middlewares.nc-header.headers.forceSTSHeader=false"
+      #- "traefik.http.middlewares.nc-header.headers.forceSTSHeader=true"
         
 
     links:

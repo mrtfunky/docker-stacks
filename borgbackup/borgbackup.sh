@@ -141,7 +141,14 @@ unmount_backup_location "${BACKUP_DESTINATION}"
 # Check if script executed successfully
 if [ $? -eq 0 ]; then
     echo "All folder backups completed successfully."
+    
+    # Send email notification
+    send_email "Backup finished successfully" "All folder backups completed successfully."
 else
     echo "Error: Some folder backups failed."
+
+    # Send email notification
+    send_email "!!! ALERT !!! Backup encountered errors" "Some folder backups failed."
+
     exit 1
 fi
