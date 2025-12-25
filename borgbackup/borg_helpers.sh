@@ -2,6 +2,10 @@
 
 BORG_REPO_BASE=/nfs_shares/backup/borgbackup
 
+# Some settings for borg commands
+export BORG_RELOCATED_REPO_ACCESS_IS_OK="yes"
+export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK="yes"
+
 check_dry_run() {
     DRY_RUN=""
     # Check parameter 
@@ -137,11 +141,13 @@ backup_folder() {
     local repo_name=$(basename "${folder_path}")
 
     echo "Backing up folder ${folder_path}..."
+
     borg create \
         --verbose \
         --progress \
         --stats \
         --show-rc \
+        --exclude-from ${SCRIPT_DIR}/excludes.txt \
         --compression zlib \
         ${BACKUP_DESTINATION}/${repo_name}::${repo_name}-${timestamp} ${folder_path}
 
@@ -257,4 +263,35 @@ send_email() {
     local body=$2
 
     echo "${body}" | mail -s "${subject}" ${EMAIL_RECIPIENT}
+}
+
+# Function wakes up the NAS via Wake-on-LAN
+wake_nas_and_wait() {
+    echo "Waking up NAS with MAC address ${NAS_MAC}..."
+    ether-wake -i ${NET_INTERFACE} ${NAS_MAC}
+
+    # Wait for NAS to boot up for 10 minutes
+    echo "Waiting for NAS to boot up..."
+    sleep 600
+
+    # Check if wakeonlan command was successful
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to send Wake-on-LAN packet to NAS."
+        exit 1
+    fi
+}
+
+# Function to shut down the NAS via SSH
+power_down_nas() {
+    echo "Wait for 5 minutes before shutting down NAS..."
+    sleep 300
+    
+    echo "Shutting down NAS via SSH"
+    ssh ${NAS_USER}@${HOST} 'sudo /usr/syno/sbin/synoshutdown -s'
+
+    # Check if SSH command was successful
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to shut down NAS via SSH."
+        exit 1
+    fi
 }

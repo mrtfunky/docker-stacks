@@ -28,6 +28,23 @@ elif [ "$SCRIPT_NAME" = "backup" ]; then
 fi
 
 
+# Parse command-line arguments
+# Options:
+#   --now            Perform backup immediately. Do not wake and power down NAS.
+BACKUP_NAS_WAKE_ON_LAN=1
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --now)
+            BACKUP_NAS_WAKE_ON_LAN=0
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
 # Import or define configuration and folder list
 # Needs to define:
 #   HOST - NFS host
@@ -39,6 +56,11 @@ source ${SCRIPT_DIR}/borgbackup_config.sh
 
 # Import helper functions
 source ${SCRIPT_DIR}/borg_helpers.sh
+
+# Wake up NAS if required
+if [ $BACKUP_NAS_WAKE_ON_LAN -eq 1 ]; then
+    wake_nas_and_wait
+fi
 
 # Mount NFS backup location
 mount_backup_location "${BACKUP_DESTINATION}"
@@ -137,6 +159,11 @@ fi
 
 # Unmount NFS backup location
 unmount_backup_location "${BACKUP_DESTINATION}" 
+
+# Power down NAS if Wake-on-LAN was used
+if [ $BACKUP_NAS_WAKE_ON_LAN -eq 1 ]; then
+    power_down_nas
+fi
 
 # Check if script executed successfully
 if [ $? -eq 0 ]; then

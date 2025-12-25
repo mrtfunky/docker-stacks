@@ -32,6 +32,7 @@ install -D ${SCRIPT_DIR}/status                "$INSTALL_DIR/bin/status"
 install -D ${SCRIPT_DIR}/today                 "$INSTALL_DIR/bin/today"
 install -D ${SCRIPT_DIR}/borg_helpers.sh       "$INSTALL_DIR/bin/borg_helpers.sh"
 install -D ${SCRIPT_DIR}/borgbackup_config.sh  "$INSTALL_DIR/bin/borgbackup_config.sh"
+install -D ${SCRIPT_DIR}/excludes.txt          "$INSTALL_DIR/bin/excludes.txt"
 
 # Install docker-compose.yml files for each stack
 for stack in "${STASKS_TO_STOP[@]}"; do
