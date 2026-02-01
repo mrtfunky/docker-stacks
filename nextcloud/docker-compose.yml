@@ -78,7 +78,7 @@ services:
       
       # Paperless documents and consume folder. Skip if you don't use paperless
       - /docker_volumes/paperless_media:/external/paperless_media
-      - paperless_consume:/external/paperless_consume
+      - /docker_volumes/paperless_consume:/external/paperless_consume
     environment:
       - NEXTCLOUD_ADMIN_USER=${APP_ADMIN_NAME}
       - NEXTCLOUD_ADMIN_PASSWORD=${APP_ADMIN_PASSWORD}

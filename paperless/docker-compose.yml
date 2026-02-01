@@ -58,15 +58,15 @@ services:
     volumes:
       - /docker_volumes/paperless_data:/usr/src/paperless/data
       - /docker_volumes/paperless_media:/usr/src/paperless/media
+      - /docker_volumes/paperless_consume:/usr/src/paperless/consume
       - paperless_export:/usr/src/paperless/export
-      - paperless_consume:/usr/src/paperless/consume
       
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
       PAPERLESS_URL: https://${APP_HOST_NAME}
-      USERMAP_UID: 33
-      USERMAP_GID: 33
+      USERMAP_UID: ${USERMAP_UID}
+      USERMAP_GID: ${USERMAP_GID}
       PAPERLESS_TIME_ZONE: Europe/Berlin
       PAPERLESS_ADMIN_USER: ${APP_ADMIN_USER}
       PAPERLESS_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
